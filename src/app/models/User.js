@@ -1,6 +1,5 @@
 import { Model, Sequelize } from 'sequelize';
 import bcrypt from 'bcryptjs';
-import { async } from 'C:/Users/artur/AppData/Local/Microsoft/TypeScript/3.5/node_modules/rxjs/internal/scheduler/async';
 
 class User extends Model {
   static init(sequelize) {
@@ -17,13 +16,17 @@ class User extends Model {
       }
     );
 
-    this.addHook('beforeCreate', async user => {
+    this.addHook('beforeSave', async user => {
       if (user.password) {
         user.password_hash = await bcrypt.hash(user.password, 8);
       }
     });
 
     return this;
+  }
+
+  checkPassword(password) {
+    return bcrypt.compare(password, this.password_hash);
   }
 }
 
